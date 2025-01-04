@@ -1,0 +1,19 @@
+User (Uppercase)
+User is typically the Mongoose model you defined for the users collection in MongoDB.
+It's the interface you use to interact with the database (e.g., querying, creating, updating, or deleting documents).
+Key Characteristics of User:
+It's a constructor function created by mongoose.model.
+Allows interaction with MongoDB using static methods like .findOne, .create, and .updateOne.
+
+
+
+user (Lowercase)
+user is a variable or an instance of the User model.
+Typically, it represents a single document retrieved from the database using the User model.
+Example:
+javascript
+Copy code
+const user = await User.findOne({ email: "example@example.com" });
+Key Characteristics of user:
+It is an instance of the Mongoose model.
+Has all the fields defined in the userSchema and access to instance methods, like isPasswordCorrect.

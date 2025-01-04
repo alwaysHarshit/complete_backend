@@ -3,6 +3,7 @@ import {uploadFile} from "../utils/fileupload.js";
 
 const userRegister = async (req, res) => {
 	//get the user data from front end
+	console.log(req.body)
 	const {username, email, password, fullName} = req.body;
 	// console.log(username, email, password, fullName);
 
@@ -29,7 +30,7 @@ const userRegister = async (req, res) => {
 	//get the avtar from the request and store it on cloudinary
 	const localAvtarPath = req.files.avtar ? req.files.avtar[0].path : res.status(400).json({message: "Avtar is required"});
 	let avtarPath;
-	if (localAvtarPath){
+	if (localAvtarPath) {
 		avtarPath = await uploadFile(localAvtarPath);
 	}
 
@@ -46,7 +47,7 @@ const userRegister = async (req, res) => {
 		password: password,
 		fullName: fullName,
 		avtar: avtarPath,
-		coverImage: coverImagePath ||"",
+		coverImage: coverImagePath || "",
 	})
 	console.log(user);
 	//check for user for creation
@@ -58,11 +59,54 @@ const userRegister = async (req, res) => {
 
 	//remove the password from the user object from response
 	//return the user object
-
 	return res.status(201).json({
 		message: "User created successfully", user: {
 			_id: user._id, avtar: user.avtar, coverImage: user.coverImage,
 		}
 	});
 }
-export default userRegister;
+
+const generateAccessAndRefreshToken = async (userId) => {
+	const user = await User.findOne(userId);
+	const accessToken = user.generateAccessToken();
+	const refreshToken = user.generateRefreshToken();
+	user.refreshToken = refreshToken;
+	await user.save({validateBeforeSave: false});//
+	return {accessToken, refreshToken};
+}
+
+const userLogin = async (req, res) => {
+	console.log(req.body)
+	//get the user data from the request
+	const {email, password} = req.body;
+
+	//validate user data
+	if (!email) return res.status(400).json({message: "Email is required"});
+
+	//check if the user is in the database
+	const user = await User.findOne({email})
+	if (!user) return res.status(400).json({message: "User not found"});
+	//console.log("isPasswordCorrect exists:", typeof user.isPasswordCorrect === "function");
+
+
+	//check if the password is correct
+	const isPasswordValid = await user.isPasswordCorrect(password);
+	if (!isPasswordValid) return res.status(400).json({
+		messageerror: "Incorrect password"
+	})
+
+	//generate access token and refresh token and store in db
+	const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id);
+	console.log(accessToken, refreshToken, user);
+
+
+	//send the user object with access token in cookie
+	return res.status(201)
+		.cookie("accessToken", accessToken, {httpOnly: true, secure: true})
+		.cookie("refreshToken", refreshToken, {httpOnly: true, secure: true})
+		.json({
+			message: "User logged in successfully",
+		});//you can use .end() to  the response without sending a body. or use send() to send a response body or json() to send a JSON response body.
+}
+
+export {userRegister, userLogin};

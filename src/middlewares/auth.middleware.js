@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import {User} from "../models/user.model.js";
 
 export const verifyJWtToken= async (req, res, next) => {
+	console.log(req.cookies,"only cookeeeeeeeeeeeeeeeeeeeeeeeeees");
 
 		const token = req.cookies.accessToken
 		console.log("**incoming access-token from logout**",token)

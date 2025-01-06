@@ -121,4 +121,26 @@ const userLogout = async (req, res) => {
 		.json({message: "logout"})
 
 }
-export {userRegister, userLogin, userLogout};
+
+const userGetProfile = async (req, res) => {
+	const user = req.user;
+	return res.status(200).send(user)
+}
+
+const updatePassword = async (req, res) => {
+	console.log(res.body)
+	const {newPassword} = req.body;
+	if (!newPassword) return res.status(401).json({
+		messageerror: "Require new password"
+	})
+	const userId = req.user?._id;
+	const user=await User.findOne(userId);
+	user.password=newPassword;
+	await user.save({validateBeforeSave:false})
+	return res.status(200).json({
+		message:"updated successfully"
+	})
+
+}
+
+export {userRegister, userLogin, userLogout, userGetProfile,updatePassword};

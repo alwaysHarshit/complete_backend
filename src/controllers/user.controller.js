@@ -44,7 +44,7 @@ const userRegister = async (req, res) => {
 		fullName: fullName,
 		avtar: avtarPath,
 		coverImage: coverImagePath || "",
-		refreshToken:""
+		refreshToken: ""
 	})
 	console.log(user);
 	//check for user for creation
@@ -68,7 +68,7 @@ const generateAccessAndRefreshToken = async (userId) => {
 	const accessToken = user.generateAccessToken();
 	const refreshToken = user.generateRefreshToken();
 	user.refreshToken = refreshToken;
-	console.log("updated refreshtoken",refreshToken)
+	console.log("updated refreshtoken", refreshToken)
 	console.log(await User.findOne({userId}))
 	await user.save({validateBeforeSave: false});//
 	return {accessToken, refreshToken};
@@ -96,7 +96,7 @@ const userLogin = async (req, res) => {
 
 	//generate access token and refresh token and store in db
 	const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id);
-	console.log("genrated access token :",accessToken,user);
+	console.log("genrated access token :", accessToken, user);
 
 
 	//send the user object with access token in cookie
@@ -108,20 +108,17 @@ const userLogin = async (req, res) => {
 		});//you can use .end() to  the response without sending a body. or use send() to send a response body or json() to send a JSON response body.
 }
 
-const userLogout= async (req, res)=>{
+const userLogout = async (req, res) => {
 	const userId = req.user._id.toString();
-	await User.findByIdAndUpdate(
-		userId,{
-			$set:{refreshToken:undefined}
-		},
-		{
-			new:true
-		}
-	)
-	 return res.status(200)
+	await User.findByIdAndUpdate(userId, {
+		$set: {refreshToken: undefined}
+	}, {
+		new: true
+	})
+	return res.status(200)
 		.clearCookie("accessToken", {httpOnly: true, secure: true})
-		.clearCookie("refreshToken",{httpOnly: true, secure: true})
-		.json({message:"logout"})
-	console.log(res.cookies);
+		.clearCookie("refreshToken", {httpOnly: true, secure: true})
+		.json({message: "logout"})
+
 }
-export {userRegister, userLogin,userLogout};
+export {userRegister, userLogin, userLogout};

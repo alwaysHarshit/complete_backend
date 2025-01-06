@@ -15,11 +15,7 @@ const userRegister = async (req, res) => {
 
 	//check if the user is already in the database
 	const userExist = await User.findOne({
-		$or: [{
-			username: username
-		}, {
-			email: email
-		}]
+		$or: [{username: username}, {email: email}]
 	})
 	if (userExist) {
 		return res.status(400).json({
@@ -48,6 +44,7 @@ const userRegister = async (req, res) => {
 		fullName: fullName,
 		avtar: avtarPath,
 		coverImage: coverImagePath || "",
+		refreshToken:""
 	})
 	console.log(user);
 	//check for user for creation
@@ -71,6 +68,8 @@ const generateAccessAndRefreshToken = async (userId) => {
 	const accessToken = user.generateAccessToken();
 	const refreshToken = user.generateRefreshToken();
 	user.refreshToken = refreshToken;
+	console.log("updated refreshtoken",refreshToken)
+	console.log(await User.findOne({userId}))
 	await user.save({validateBeforeSave: false});//
 	return {accessToken, refreshToken};
 }
@@ -97,7 +96,7 @@ const userLogin = async (req, res) => {
 
 	//generate access token and refresh token and store in db
 	const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id);
-	console.log(accessToken, refreshToken, user);
+	console.log("genrated access token :",accessToken,user);
 
 
 	//send the user object with access token in cookie
@@ -109,4 +108,20 @@ const userLogin = async (req, res) => {
 		});//you can use .end() to  the response without sending a body. or use send() to send a response body or json() to send a JSON response body.
 }
 
-export {userRegister, userLogin};
+const userLogout= async (req, res)=>{
+	const userId = req.user._id.toString();
+	await User.findByIdAndUpdate(
+		userId,{
+			$set:{refreshToken:undefined}
+		},
+		{
+			new:true
+		}
+	)
+	 return res.status(200)
+		.clearCookie("accessToken", {httpOnly: true, secure: true})
+		.clearCookie("refreshToken",{httpOnly: true, secure: true})
+		.json({message:"logout"})
+	console.log(res.cookies);
+}
+export {userRegister, userLogin,userLogout};

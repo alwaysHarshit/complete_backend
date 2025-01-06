@@ -1,6 +1,7 @@
 import {Router} from "express";
-import {userLogin, userRegister} from "../controllers/user.controller.js";
+import {userLogin, userRegister,userLogout} from "../controllers/user.controller.js";
 import {upload} from "../middlewares/multer.middleware.js";
+import {verifyJWtToken} from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -27,4 +28,5 @@ router.route("/login").post(upload.any(),userLogin);
 Ensure login data is sent as JSON with Content-Type: application/json.
 Remove the global application of upload.any() and apply it only to routes that require file handling.*/
 
+router.route("/logout").post(upload.any(),verifyJWtToken,userLogout);
 export default router;

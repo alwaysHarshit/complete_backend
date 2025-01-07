@@ -24,6 +24,7 @@ const userRegister = async (req, res) => {
 	}
 
 	//get the avtar from the request and store it on cloudinary
+	console.log(req.files.avtar)
 	const localAvtarPath = req.files.avtar ? req.files.avtar[0].path : res.status(400).json({message: "Avtar is required"});
 	let avtarPath;
 	if (localAvtarPath) {

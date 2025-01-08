@@ -24,7 +24,6 @@ const userRegister = async (req, res) => {
 	}
 
 	//get the avtar from the request and store it on cloudinary
-	console.log(req.files.avtar)
 	const localAvtarPath = req.files.avtar ? req.files.avtar[0].path : res.status(400).json({message: "Avtar is required"});
 	let avtarPath;
 	if (localAvtarPath) {
@@ -75,39 +74,68 @@ const generateAccessAndRefreshToken = async (userId) => {
 	return {accessToken, refreshToken};
 }
 
+// const userLogin = async (req, res) => {
+// 	console.log(req.body)
+// 	//get the user data from the request
+// 	const {email, password} = req.body;
+//
+// 	//validate user data
+// 	if (!email) return res.status(400).json({message: "Email is required"});
+//
+// 	//check if the user is in the database
+// 	const user = await User.findOne({email})
+// 	if (!user) return res.status(400).json({message: "User not found"});
+// 	//console.log("isPasswordCorrect exists:", typeof user.isPasswordCorrect === "function");
+//
+// 	//check if the password is correct
+// 	const isPasswordValid = await user.isPasswordCorrect(password);
+// 	if (!isPasswordValid) return res.status(400).json({
+// 		message: "Incorrect password"
+// 	})
+//
+// 	//generate access token and refresh token and store in db
+// 	const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id);
+// 	console.log("genrated access token :", accessToken, user);
+//
+//
+// 	//send the user object with access token in cookie
+// 	return res.status(201)
+// 		.cookie("accessToken", accessToken, {httpOnly: false, secure: false, sameSite: "None"})
+// 		.cookie("refreshToken", refreshToken, {httpOnly: false, secure: false, sameSite: "None"})
+// 		.json({
+// 			message: "User logged in successfully",
+// 		});//you can use .end() to  the response without sending a body. or use send() to send a response body or json() to send a JSON response body.
+// }
 const userLogin = async (req, res) => {
-	console.log(req.body)
-	//get the user data from the request
-	const {email, password} = req.body;
+	console.log(req.body);
 
-	//validate user data
-	if (!email) return res.status(400).json({message: "Email is required"});
+	const { email, password } = req.body;
 
-	//check if the user is in the database
-	const user = await User.findOne({email})
-	if (!user) return res.status(400).json({message: "User not found"});
-	//console.log("isPasswordCorrect exists:", typeof user.isPasswordCorrect === "function");
+	// Validate input
+	if (!email) return res.status(400).json({ message: "Email is required" });
 
+	// Check if user exists
+	const user = await User.findOne({ email });
+	if (!user) return res.status(400).json({ message: "User not found" });
 
-	//check if the password is correct
+	// Validate password
 	const isPasswordValid = await user.isPasswordCorrect(password);
-	if (!isPasswordValid) return res.status(400).json({
-		messageerror: "Incorrect password"
-	})
+	if (!isPasswordValid) {
+		return res.status(400).json({ message: "Incorrect password" });
+	}
 
-	//generate access token and refresh token and store in db
-	const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id);
-	console.log("genrated access token :", accessToken, user);
+	// Generate tokens
+	const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
+	console.log("Generated access token:", accessToken);
 
+	// Return tokens in response body
+	return res.status(201).json({
+		message: "User logged in successfully",
+		accessToken,
+		refreshToken,
+	});
+};
 
-	//send the user object with access token in cookie
-	return res.status(201)
-		.cookie("accessToken", accessToken, {httpOnly: true, secure: true})
-		.cookie("refreshToken", refreshToken, {httpOnly: true, secure: true})
-		.json({
-			message: "User logged in successfully",
-		});//you can use .end() to  the response without sending a body. or use send() to send a response body or json() to send a JSON response body.
-}
 
 const userLogout = async (req, res) => {
 	const userId = req.user._id.toString();
@@ -125,6 +153,7 @@ const userLogout = async (req, res) => {
 
 const userGetProfile = async (req, res) => {
 	const user = req.user;
+	console.log(user,"!!!!!!!!!!!!!!!!!!!!!!!!!")
 	return res.status(200).send(user)
 }
 

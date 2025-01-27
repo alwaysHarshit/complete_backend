@@ -12,8 +12,10 @@ import cookieParser from "cookie-parser";
 app.use(cookieParser());//allow to execess cookie in res and req
 //routes import
 import userRouter from "./routes/user.routes.js";
+import {routerVideo} from "./routes/video.routes.js";
 
 //routes definition
 app.use('/users', userRouter);
+app.use('/videos',routerVideo);
 
 

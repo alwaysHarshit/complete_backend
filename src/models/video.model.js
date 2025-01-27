@@ -2,11 +2,7 @@ import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-aggregate-paginate-v2';
 const videoSchema = new mongoose.Schema(
     {
-        videoId:{
-            type: String,
-            required: true,
-        },
-        thumbnail:{
+        videoUrl:{
             type: String,
             required: true,
         },
@@ -24,11 +20,9 @@ const videoSchema = new mongoose.Schema(
         },
         views:{
             type: Number,
-            required: true,
         },
-        isActive:{
-            type: Boolean,
-            default: true,
+        size:{
+            type:Number
         },
         owner:{
             type: mongoose.Schema.Types.ObjectId,

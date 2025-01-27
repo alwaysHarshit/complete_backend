@@ -18,12 +18,18 @@ export const uploadFile = async (localPath) => {
 			resource_type: 'auto'
 		});
 
-
-		return result.secure_url;
-
+		if (result.resource_type === 'video') {
+			return {
+				secure_url: result.secure_url,
+				duration: result.duration,
+				size: result.bytes,
+			};
+		} else if (result.resource_type === 'image') {
+			return  result.secure_url;
+		}
 
 	} catch (error) {
-		fs.unlinkSync(localPath);//remove the file from the local storage
+		fs.unlinkSync(localPath); // remove the file from local storage
 		console.log(error);
 	}
 }

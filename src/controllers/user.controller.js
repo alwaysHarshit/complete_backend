@@ -140,7 +140,7 @@ const userLogin = async (req, res) => {
 const userLogout = async (req, res) => {
 	const userId = req.user._id.toString();
 	await User.findByIdAndUpdate(userId, {
-		$set: {refreshToken: undefined}
+		$set: {refreshToken: null}
 	}, {
 		new: true
 	})
@@ -161,7 +161,7 @@ const updatePassword = async (req, res) => {
 	console.log(res.body)
 	const {newPassword} = req.body;
 	if (!newPassword) return res.status(401).json({
-		messageerror: "Require new password"
+		message: "Require new password"
 	})
 	const userId = req.user?._id;
 	const user=await User.findOne(userId);
@@ -172,5 +172,6 @@ const updatePassword = async (req, res) => {
 	})
 
 }
+
 
 export {userRegister, userLogin, userLogout, userGetProfile,updatePassword};

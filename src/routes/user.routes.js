@@ -31,4 +31,5 @@ Remove the global application of upload.any() and apply it only to routes that r
 router.route("/logout").post(upload.any(),verifyJWtToken,userLogout);
 router.route("/user").get(verifyJWtToken,userGetProfile)
 router.route("/updatePassword").post(upload.any(),verifyJWtToken,updatePassword)
+
 export default router;

@@ -22,6 +22,8 @@ This backend powers user authentication, including 📝 registration, 🔑 login
 
 5. **🔄 Password Update**
    - Updates user 🔒 passwords securely.
+6. 🎥 Video Upload
+   Allows users to upload videos to Cloudinary with validation and secure handling.
 
 ---
 
@@ -198,6 +200,8 @@ Default URL: 🌐 `http://localhost:3000`
 - ✉️ Email verification for better security.
 - ⏳ Enhanced token renewal logic.
 - 🌐 Integration with OAuth (Google/Facebook login).
+- 💡Recommendation System
+- 
 
 ---
 
